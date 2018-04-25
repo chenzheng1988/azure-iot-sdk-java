@@ -77,7 +77,7 @@ public class ReceiveMessagesIT
     private static String expectedCorrelationId = "1234";
     private static String expectedMessageId = "5678";
     private static final int INTERTEST_GUARDIAN_DELAY_MILLISECONDS = 2000;
-    private static final long ERROR_INJECTION_WAIT_TIMEOUT = 1 * 60 * 1000; // 1 minute
+    private static final long ERROR_INJECTION_RECOVERY_TIMEOUT = 2 * 60 * 1000; // 2 minute
 
     private ReceiveMessagesITRunner testInstance;
 
@@ -427,20 +427,10 @@ public class ReceiveMessagesIT
         errorInjectionMessage.setExpiryTime(200);
         testInstance.deviceClient.sendEventAsync(errorInjectionMessage, new EventCallback(null), null);
 
-        //wait to send the message because we want to ensure that the tcp connection drop happens before the message is received
-        long startTime = System.currentTimeMillis();
-        long timeElapsed = 0;
-        while (!connectionStatusUpdates.contains(IotHubConnectionStatus.DISCONNECTED_RETRYING))
-        {
-            Thread.sleep(200);
-            timeElapsed = System.currentTimeMillis() - startTime;
+        SendMessagesCommon.waitForStabilizedConnection(connectionStatusUpdates, ERROR_INJECTION_RECOVERY_TIMEOUT);
 
-            //2 minute timeout waiting for error injection to occur
-            if (timeElapsed > ERROR_INJECTION_WAIT_TIMEOUT)
-            {
-                fail("Timed out waiting for error injection message to take effect");
-            }
-        }
+        //wait to send the message because we want to ensure that the tcp connection drop happens before the message is received
+
 
         sendMessageToDevice(testInstance.device.getDeviceId(), testInstance.protocol.toString());
         waitForMessageToBeReceived(messageReceived, testInstance.protocol.toString());

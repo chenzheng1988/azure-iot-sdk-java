@@ -335,4 +335,36 @@ public class SendMessagesCommon
             }
         }
     }
+
+    public static void waitForStabilizedConnection(List actualStatusUpdates, long timeout) throws InterruptedException
+    {
+        //wait to send the message because we want to ensure that the tcp connection drop happens before the message is received
+        long startTime = System.currentTimeMillis();
+        long timeElapsed = 0;
+        while (!actualStatusUpdates.contains(IotHubConnectionStatus.DISCONNECTED_RETRYING))
+        {
+            Thread.sleep(200);
+            timeElapsed = System.currentTimeMillis() - startTime;
+
+            // 2 minutes timeout waiting for error injection to occur
+            if (timeElapsed > timeout)
+            {
+                fail("Timed out waiting for error injection message to take effect");
+            }
+        }
+
+        int numOfUpdates = 0;
+        while (numOfUpdates != actualStatusUpdates.size() || actualStatusUpdates.get(actualStatusUpdates.size()-1) != IotHubConnectionStatus.CONNECTED)
+        {
+            numOfUpdates = actualStatusUpdates.size();
+            Thread.sleep(200);
+            timeElapsed = System.currentTimeMillis() - startTime;
+
+            // 2 minutes timeout waiting for connection to stabilized
+            if (timeElapsed > timeout)
+            {
+                fail("Timed out waiting for a stable connection after error injection");
+            }
+        }
+    }
 }
