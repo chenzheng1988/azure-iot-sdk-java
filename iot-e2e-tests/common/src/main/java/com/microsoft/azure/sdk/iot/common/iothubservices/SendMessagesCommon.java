@@ -7,8 +7,8 @@ package com.microsoft.azure.sdk.iot.common.iothubservices;
 
 import com.microsoft.azure.sdk.iot.common.*;
 import com.microsoft.azure.sdk.iot.device.*;
-import com.microsoft.azure.sdk.iot.device.exceptions.TransportException;
 import com.microsoft.azure.sdk.iot.device.transport.IotHubConnectionStatus;
+import com.microsoft.azure.sdk.iot.service.auth.AuthenticationType;
 import org.junit.Assert;
 
 import java.io.IOException;
@@ -62,7 +62,8 @@ public class SendMessagesCommon
                                                                          final Integer RETRY_MILLISECONDS,
                                                                          final Integer SEND_TIMEOUT_MILLISECONDS,
                                                                          final IotHubConnectionStatus expectedStatus,
-                                                                         int interMessageDelay) throws IOException, InterruptedException
+                                                                         int interMessageDelay,
+                                                                         AuthenticationType authType) throws IOException, InterruptedException
     {
         final List<IotHubConnectionStatus> expectedStatusUpdates = new ArrayList<>();
         client.registerConnectionStatusChangeCallback(new IotHubConnectionStatusChangeCallback()
@@ -75,7 +76,7 @@ public class SendMessagesCommon
 
         sendMessages(client, protocol, messagesToSend, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, interMessageDelay);
 
-        assertTrue("Expected connection status update to occur: " + expectedStatus, expectedStatusUpdates.contains(expectedStatus));
+        assertTrue(protocol + ", " + authType + ": Expected connection status update to occur: " + expectedStatus, expectedStatusUpdates.contains(expectedStatus));
     }
 
     /**
@@ -88,7 +89,8 @@ public class SendMessagesCommon
                                                                String protocol,
                                                                int numberOfMessages,
                                                                Integer retryMilliseconds,
-                                                               long timeoutMilliseconds)
+                                                               long timeoutMilliseconds,
+                                                               AuthenticationType authType)
     {
         for (int i = 0; i < numberOfMessages; ++i)
         {
@@ -110,7 +112,7 @@ public class SendMessagesCommon
                     Thread.sleep(retryMilliseconds);
                     if (System.currentTimeMillis() - startTime > timeoutMilliseconds)
                     {
-                        fail("Sending message over " + protocol + " protocol failed: " +
+                        fail(protocol + ", " + authType + ": Sending message over " + protocol + " protocol failed: " +
                                 "never received connection status update for SAS_TOKEN_EXPIRED " +
                                 "or never received UNAUTHORIZED message callback");
                     }
@@ -118,12 +120,12 @@ public class SendMessagesCommon
 
                 if (messageSent.getCallbackStatusCode() != IotHubStatusCode.UNAUTHORIZED)
                 {
-                    fail("Send messages expecting sas token expiration failed: expected UNAUTHORIZED message callback, but got " + messageSent.getCallbackStatusCode());
+                    fail(protocol + ", " + authType + ": Send messages expecting sas token expiration failed: expected UNAUTHORIZED message callback, but got " + messageSent.getCallbackStatusCode());
                 }
             }
             catch (Exception e)
             {
-                Assert.fail("Sending message over " + protocol + " protocol failed");
+                Assert.fail(protocol + ", " + authType + ": Sending message over " + protocol + " protocol failed");
             }
         }
     }
@@ -173,7 +175,8 @@ public class SendMessagesCommon
     public static void sendExpiredMessageExpectingMessageExpiredCallback(DeviceClient deviceClient,
                                                                          IotHubClientProtocol protocol,
                                                                          final Integer RETRY_MILLISECONDS,
-                                                                         final Integer SEND_TIMEOUT_MILLISECONDS) throws IOException, URISyntaxException
+                                                                         final Integer SEND_TIMEOUT_MILLISECONDS,
+                                                                         AuthenticationType authType) throws IOException
     {
         try
         {
@@ -190,7 +193,7 @@ public class SendMessagesCommon
                 Thread.sleep(RETRY_MILLISECONDS);
                 if (System.currentTimeMillis() - startTime > SEND_TIMEOUT_MILLISECONDS)
                 {
-                    fail("Timed out waiting for a message callback");
+                    fail(protocol + ", " + authType + ": Timed out waiting for a message callback");
                 }
             }
 
@@ -210,7 +213,8 @@ public class SendMessagesCommon
 
     public static void sendMessagesExpectingUnrecoverableConnectionLossAndTimeout(DeviceClient client,
                                                                                   IotHubClientProtocol protocol,
-                                                                                  Message errorInjectionMessage) throws IOException, InterruptedException
+                                                                                  Message errorInjectionMessage,
+                                                                                  AuthenticationType authType) throws IOException, InterruptedException
     {
         final List<IotHubConnectionStatus> statusUpdates = new ArrayList<>();
         client.registerConnectionStatusChangeCallback(new IotHubConnectionStatusChangeCallback()
@@ -236,8 +240,8 @@ public class SendMessagesCommon
             }
         }
 
-        assertTrue("Expected notification about disconnected but retrying. Protocol: " + protocol, statusUpdates.contains(IotHubConnectionStatus.DISCONNECTED_RETRYING));
-        assertTrue("Expected notification about disconnected. Protocol: " + protocol, statusUpdates.contains(IotHubConnectionStatus.DISCONNECTED));
+        assertTrue(protocol + ", " + authType + ": Expected notification about disconnected but retrying.", statusUpdates.contains(IotHubConnectionStatus.DISCONNECTED_RETRYING));
+        assertTrue(protocol + ", " + authType + ": Expected notification about disconnected.", statusUpdates.contains(IotHubConnectionStatus.DISCONNECTED));
 
         client.closeNow();
     }
@@ -294,7 +298,7 @@ public class SendMessagesCommon
         {
             if (System.currentTimeMillis() - startTime > OPEN_RETRY_TIMEOUT)
             {
-                Assert.fail("Could not open the device client");
+                Assert.fail("Timed out trying to open the device client");
             }
 
             try
@@ -319,7 +323,7 @@ public class SendMessagesCommon
         {
             if (System.currentTimeMillis() - startTime > OPEN_RETRY_TIMEOUT)
             {
-                Assert.fail("Could not open the device client");
+                Assert.fail("Timed out trying to open the transport client");
             }
 
             try

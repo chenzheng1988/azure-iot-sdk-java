@@ -394,7 +394,7 @@ public class ReceiveMessagesIT
         // Now wait for messages to be received in the device client
         waitForBackToBackC2DMessagesToBeReceived();
         testInstance.deviceClient.closeNow(); //close the device client connection
-        assertTrue("Received messages don't match up with sent messages", messageIdListStoredOnReceive.containsAll(messageIdListStoredOnC2DSend)); // check if the received list is same as the actual list that was created on sending the messages
+        assertTrue(testInstance.protocol + ", " + testInstance.authenticationType + ": Received messages don't match up with sent messages", messageIdListStoredOnReceive.containsAll(messageIdListStoredOnC2DSend)); // check if the received list is same as the actual list that was created on sending the messages
     }
 
     private void errorInjectionTestFlow(Message errorInjectionMessage) throws IOException, IotHubException, InterruptedException
@@ -427,10 +427,9 @@ public class ReceiveMessagesIT
         errorInjectionMessage.setExpiryTime(200);
         testInstance.deviceClient.sendEventAsync(errorInjectionMessage, new EventCallback(null), null);
 
+        //wait to send the message because we want to ensure that the tcp connection drop happens beforehand and we
+        // want the connection to be re-established before sending anything from service client
         SendMessagesCommon.waitForStabilizedConnection(connectionStatusUpdates, ERROR_INJECTION_RECOVERY_TIMEOUT);
-
-        //wait to send the message because we want to ensure that the tcp connection drop happens before the message is received
-
 
         sendMessageToDevice(testInstance.device.getDeviceId(), testInstance.protocol.toString());
         waitForMessageToBeReceived(messageReceived, testInstance.protocol.toString());
@@ -438,7 +437,7 @@ public class ReceiveMessagesIT
         Thread.sleep(200);
         testInstance.deviceClient.closeNow();
 
-        assertTrue("Error Injection message did not cause service to drop TCP connection", connectionStatusUpdates.contains(IotHubConnectionStatus.DISCONNECTED_RETRYING));
+        assertTrue(testInstance.protocol + ", " + testInstance.authenticationType + ": Error Injection message did not cause service to drop TCP connection", connectionStatusUpdates.contains(IotHubConnectionStatus.DISCONNECTED_RETRYING));
     }
 
     private static class MessageCallbackForBackToBackC2DMessages implements com.microsoft.azure.sdk.iot.device.MessageCallback
@@ -535,18 +534,18 @@ public class ReceiveMessagesIT
 
                 if (System.currentTimeMillis() - startTime > receiveTimeout)
                 {
-                    fail("Timed out waiting to receive message");
+                    fail(testInstance.protocol + ", " + testInstance.authenticationType + ": Timed out waiting to receive message");
                 }
             }
 
             if (!messageReceived.getResult())
             {
-                Assert.fail("Receiving message over " + protocolName + " protocol failed. Received message was missing expected properties");
+                Assert.fail(testInstance.protocol + ", " + testInstance.authenticationType + ": Receiving message over " + protocolName + " protocol failed. Received message was missing expected properties");
             }
         }
         catch (InterruptedException e)
         {
-            Assert.fail("Receiving message over " + protocolName + " protocol failed");
+            Assert.fail(testInstance.protocol + ", " + testInstance.authenticationType + ": Receiving message over " + protocolName + " protocol failed. Unexpected interrupted exception occurred");
         }
     }
 
@@ -563,13 +562,13 @@ public class ReceiveMessagesIT
 
                 if (System.currentTimeMillis() - startTime > receiveTimeout)
                 {
-                    Assert.fail("Receiving messages timed out.");
+                    Assert.fail(testInstance.protocol + ", " + testInstance.authenticationType + ": Receiving messages timed out.");
                 }
             }
         }
         catch (InterruptedException e)
         {
-            Assert.fail("Receiving message failed");
+            Assert.fail(testInstance.protocol + ", " + testInstance.authenticationType + ": Receiving message failed. Unexpected interrupted exception occurred.");
         }
     }
 }

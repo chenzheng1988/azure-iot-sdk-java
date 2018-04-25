@@ -404,7 +404,7 @@ public class SendMessagesIT
     @Test
     public void sendMessages() throws IOException, InterruptedException
     {
-        if (testInstance.protocol == IotHubClientProtocol.MQTT_WS &&(testInstance.authenticationType == AuthenticationType.SELF_SIGNED || testInstance.authenticationType == AuthenticationType.CERTIFICATE_AUTHORITY))
+        if (testInstance.protocol == IotHubClientProtocol.MQTT_WS && (testInstance.authenticationType == AuthenticationType.SELF_SIGNED || testInstance.authenticationType == AuthenticationType.CERTIFICATE_AUTHORITY))
         {
             //mqtt_ws does not support x509 auth currently
             return;
@@ -503,14 +503,14 @@ public class SendMessagesIT
 
         //Force the SAS token to expire before sending messages
         Thread.sleep(MILLISECONDS_TO_WAIT_FOR_TOKEN_TO_EXPIRE);
-        SendMessagesCommon.sendMessagesExpectingSASTokenExpiration(client, testInstance.protocol.toString(), 1, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS);
+        SendMessagesCommon.sendMessagesExpectingSASTokenExpiration(client, testInstance.protocol.toString(), 1, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, testInstance.authenticationType);
         client.closeNow();
     }
 
     @Test
     public void expiredMessagesAreNotSent() throws URISyntaxException, IOException
     {
-        SendMessagesCommon.sendExpiredMessageExpectingMessageExpiredCallback(testInstance.deviceClient, testInstance.protocol, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS);
+        SendMessagesCommon.sendExpiredMessageExpectingMessageExpiredCallback(testInstance.deviceClient, testInstance.protocol, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, testInstance.authenticationType);
     }
 
     @Test
@@ -523,7 +523,7 @@ public class SendMessagesIT
             return;
         }
 
-        sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, TCP_CONNECTION_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 400);
+        sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, TCP_CONNECTION_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 400, testInstance.authenticationType);
     }
 
     @Test
@@ -535,7 +535,7 @@ public class SendMessagesIT
             return;
         }
 
-        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_CONNECTION_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 400);
+        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_CONNECTION_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 400, testInstance.authenticationType);
     }
 
     @Test
@@ -547,7 +547,7 @@ public class SendMessagesIT
             return;
         }
 
-        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_SESSION_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 400);
+        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_SESSION_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 400, testInstance.authenticationType);
     }
 
     @Test
@@ -565,7 +565,7 @@ public class SendMessagesIT
             return;
         }
 
-        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_CBS_REQUEST_LINK_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 600);
+        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_CBS_REQUEST_LINK_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 600, testInstance.authenticationType);
     }
 
     @Test
@@ -583,7 +583,7 @@ public class SendMessagesIT
             return;
         }
 
-        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_CBS_RESPONSE_LINK_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 600);
+        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_CBS_RESPONSE_LINK_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 600, testInstance.authenticationType);
     }
 
     @Test
@@ -595,7 +595,7 @@ public class SendMessagesIT
             return;
         }
 
-        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_D2C_LINK_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 600);
+        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_D2C_LINK_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 600, testInstance.authenticationType);
     }
 
     @Test
@@ -614,7 +614,7 @@ public class SendMessagesIT
             return;
         }
 
-        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_C2D_LINK_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 600);
+        SendMessagesCommon.sendMessagesExpectingConnectionStatusChangeUpdate(testInstance.deviceClient, testInstance.protocol, AMQP_C2D_LINK_DROP_MESSAGES_TO_SEND, RETRY_MILLISECONDS, SEND_TIMEOUT_MILLISECONDS, IotHubConnectionStatus.DISCONNECTED_RETRYING, 600, testInstance.authenticationType);
     }
 
     @Test
@@ -630,7 +630,7 @@ public class SendMessagesIT
         testInstance.deviceClient.setRetryPolicy(new NoRetry());
 
         Message tcpConnectionDropErrorInjectionMessageUnrecoverable = ErrorInjectionHelper.tcpConnectionDropErrorInjectionMessage(1, 100000);
-        sendMessagesExpectingUnrecoverableConnectionLossAndTimeout(testInstance.deviceClient, testInstance.protocol, tcpConnectionDropErrorInjectionMessageUnrecoverable);
+        sendMessagesExpectingUnrecoverableConnectionLossAndTimeout(testInstance.deviceClient, testInstance.protocol, tcpConnectionDropErrorInjectionMessageUnrecoverable, testInstance.authenticationType);
 
         //reset back to default
         testInstance.deviceClient.setRetryPolicy(new ExponentialBackoffWithJitter());
