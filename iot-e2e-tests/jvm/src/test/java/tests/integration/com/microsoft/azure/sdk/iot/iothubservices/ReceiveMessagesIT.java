@@ -41,6 +41,7 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class ReceiveMessagesIT
 {
+    private static final long DEFAULT_TEST_TIMEOUT = 3 * 60 * 1000;
     public static Map<String, String> messageProperties = new HashMap<>(3);
 
     private final static String SET_MINIMUM_POLLING_INTERVAL = "SetMinimumPollingInterval";
@@ -71,7 +72,7 @@ public class ReceiveMessagesIT
     private static ServiceClient serviceClient;
 
     // How much to wait until receiving a message from the server, in milliseconds
-    private Integer receiveTimeout = 240000; // 4 minutes
+    private Integer receiveTimeout = 2 * 60 * 1000; // 4 minutes
 
     private static String expectedCorrelationId = "1234";
     private static String expectedMessageId = "5678";
@@ -211,7 +212,7 @@ public class ReceiveMessagesIT
         }
     }
 
-    @Test
+    @Test (timeout = DEFAULT_TEST_TIMEOUT)
     public void receiveMessagesOverIncludingProperties() throws Exception
     {
         if (testInstance.protocol == HTTPS)
@@ -238,7 +239,7 @@ public class ReceiveMessagesIT
         testInstance.deviceClient.closeNow();
     }
 
-    @Test
+    @Test (timeout = DEFAULT_TEST_TIMEOUT)
     public void receiveMessagesWithTCPConnectionDrop() throws IOException, IotHubException, InterruptedException
     {
         if (testInstance.protocol == HTTPS)
@@ -250,7 +251,7 @@ public class ReceiveMessagesIT
         this.errorInjectionTestFlow(ErrorInjectionHelper.tcpConnectionDropErrorInjectionMessage(DefaultDelayInSec, DefaultDurationInSec));
     }
 
-    @Test
+    @Test (timeout = DEFAULT_TEST_TIMEOUT)
     public void receiveMessagesWithAmqpsConnectionDrop() throws IOException, IotHubException, InterruptedException
     {
         if (testInstance.protocol != AMQPS && testInstance.protocol != AMQPS_WS)
@@ -262,7 +263,7 @@ public class ReceiveMessagesIT
         this.errorInjectionTestFlow(ErrorInjectionHelper.amqpsConnectionDropErrorInjectionMessage(DefaultDelayInSec, DefaultDurationInSec));
     }
 
-    @Test
+    @Test (timeout = DEFAULT_TEST_TIMEOUT)
     public void receiveMessagesWithAmqpsSessionDrop() throws IOException, IotHubException, InterruptedException
     {
         if (testInstance.protocol != AMQPS && testInstance.protocol != AMQPS_WS)
@@ -274,7 +275,7 @@ public class ReceiveMessagesIT
         this.errorInjectionTestFlow(ErrorInjectionHelper.amqpsSessionDropErrorInjectionMessage(DefaultDelayInSec, DefaultDurationInSec));
     }
 
-    @Test
+    @Test (timeout = DEFAULT_TEST_TIMEOUT)
     public void receiveMessagesWithAmqpsCBSReqLinkDrop() throws IOException, IotHubException, InterruptedException
     {
         if (testInstance.protocol != AMQPS && testInstance.protocol != AMQPS_WS)
@@ -292,7 +293,7 @@ public class ReceiveMessagesIT
         this.errorInjectionTestFlow(ErrorInjectionHelper.amqpsCBSReqLinkDropErrorInjectionMessage(DefaultDelayInSec, DefaultDurationInSec));
     }
 
-    @Test
+    @Test (timeout = DEFAULT_TEST_TIMEOUT)
     public void receiveMessagesWithAmqpsCBSRespLinkDrop() throws IOException, IotHubException, InterruptedException
     {
         if (testInstance.protocol != AMQPS && testInstance.protocol != AMQPS_WS)
@@ -310,7 +311,7 @@ public class ReceiveMessagesIT
         this.errorInjectionTestFlow(ErrorInjectionHelper.amqpsCBSRespLinkDropErrorInjectionMessage(DefaultDelayInSec, DefaultDurationInSec));
     }
 
-    @Test
+    @Test (timeout = DEFAULT_TEST_TIMEOUT)
     public void receiveMessagesWithAmqpsD2CLinkDrop() throws IOException, IotHubException, InterruptedException
     {
         if (testInstance.protocol != AMQPS && testInstance.protocol != AMQPS_WS)
@@ -322,7 +323,7 @@ public class ReceiveMessagesIT
         this.errorInjectionTestFlow(ErrorInjectionHelper.amqpsD2CTelemetryLinkDropErrorInjectionMessage(DefaultDelayInSec, DefaultDurationInSec));
     }
 
-    @Test
+    @Test (timeout = DEFAULT_TEST_TIMEOUT)
     public void receiveMessagesWithAmqpsC2DLinkDrop() throws IOException, IotHubException, InterruptedException
     {
         if (testInstance.protocol != AMQPS && testInstance.protocol != AMQPS_WS)
