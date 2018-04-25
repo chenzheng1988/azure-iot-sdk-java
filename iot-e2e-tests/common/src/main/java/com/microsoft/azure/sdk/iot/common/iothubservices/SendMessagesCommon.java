@@ -313,6 +313,8 @@ public class SendMessagesCommon
                 e.printStackTrace();
             }
         }
+
+        System.out.println("Successfully opened connection!");
     }
 
     public static void openTransportClientWithRetry(TransportClient client)
@@ -336,6 +338,12 @@ public class SendMessagesCommon
                 //ignore and try again
                 System.out.println("Encountered exception while opening transport client, retrying...");
                 e.printStackTrace();
+            }
+
+            if (clientOpenSucceeded)
+            {
+                //only write this debug if connection failed at least once
+                System.out.println("Successfully opened connection!");
             }
         }
     }
