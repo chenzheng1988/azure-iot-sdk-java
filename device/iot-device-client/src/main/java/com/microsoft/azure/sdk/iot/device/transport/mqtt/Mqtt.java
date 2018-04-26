@@ -284,9 +284,10 @@ abstract public class Mqtt implements MqttCallback
         System.out.println("waiting for mqtt lock to be released");
         synchronized (this.mqttLock)
         {
-            System.out.println("mqtt lock released!");
+            System.out.println("mqtt lock released");
             if (this.mqttConnection == null)
             {
+                System.out.println("bad stuff");
                 throw new TransportException(new IllegalArgumentException("Mqtt client should be initialised at least once before using it"));
             }
 
@@ -418,6 +419,8 @@ abstract public class Mqtt implements MqttCallback
     {
         //Codes_SRS_Mqtt_25_024: [This method shall construct new Message with the bytes obtained from parsePayload and return the message.]
         IotHubTransportMessage message = new IotHubTransportMessage(data, MessageType.DEVICE_TELEMETRY);
+
+        System.out.println("doing stuff");
 
         int propertiesStringStartingIndex = topic.indexOf(MESSAGE_SYSTEM_PROPERTY_IDENTIFIER_ENCODED);
         if (propertiesStringStartingIndex != -1)
