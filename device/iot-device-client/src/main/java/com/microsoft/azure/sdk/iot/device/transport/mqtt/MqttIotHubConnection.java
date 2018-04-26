@@ -319,14 +319,17 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
     {
         // Codes_SRS_MQTTIOTHUBCONNECTION_15_014: [The function shall attempt to consume a message
         // from various messaging clients.]
+        System.out.println("Trying to receive over methods...");
         IotHubTransportMessage message = this.deviceMethod.receive();
         if (message == null)
         {
+            System.out.println("Trying to receive over twin...");
             message = deviceTwin.receive();
         }
 
         if (message == null)
         {
+            System.out.println("Trying to receive over telemetry...");
             message = deviceMessaging.receive();
         }
 
@@ -469,6 +472,7 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
         {
             //Codes_SRS_MQTTIOTHUBCONNECTION_34_058: [This function shall attempt to receive a message.]
             transportMessage = this.receiveMessage();
+            System.out.println("received message, but was it null?");
         }
         catch (TransportException e)
         {
