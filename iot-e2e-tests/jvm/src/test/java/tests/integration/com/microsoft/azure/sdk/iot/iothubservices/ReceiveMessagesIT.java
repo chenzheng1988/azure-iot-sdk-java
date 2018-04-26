@@ -109,16 +109,16 @@ public class ReceiveMessagesIT
                 new Object[][]
                         {
                                 //sas token
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.HTTPS), HTTPS, device, SAS},
+                                //{new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.HTTPS), HTTPS, device, SAS},
                                 {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.MQTT), MQTT, device, SAS},
                                 {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.MQTT_WS), MQTT_WS, device, SAS},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), AMQPS), AMQPS, device, SAS},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.AMQPS_WS), AMQPS_WS, device, SAS},
+                                //{new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), AMQPS), AMQPS, device, SAS},
+                                //{new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.AMQPS_WS), AMQPS_WS, device, SAS},
 
                                 //x509
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), HTTPS, publicKeyCert, false, privateKey, false), HTTPS, deviceX509, SELF_SIGNED},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), MQTT, publicKeyCert, false, privateKey, false), MQTT, deviceX509, SELF_SIGNED},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), AMQPS, publicKeyCert, false, privateKey, false), AMQPS, deviceX509, SELF_SIGNED}
+                                //{new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), HTTPS, publicKeyCert, false, privateKey, false), HTTPS, deviceX509, SELF_SIGNED},
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), MQTT, publicKeyCert, false, privateKey, false), MQTT, deviceX509, SELF_SIGNED}
+                                //{new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), AMQPS, publicKeyCert, false, privateKey, false), AMQPS, deviceX509, SELF_SIGNED}
                         }
         );
     }
