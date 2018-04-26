@@ -350,6 +350,8 @@ public class SendMessagesCommon
 
     public static void waitForStabilizedConnection(List actualStatusUpdates, long timeout) throws InterruptedException
     {
+        System.out.println("Waiting for stabilized connection...");
+
         //wait to send the message because we want to ensure that the tcp connection drop happens before the message is received
         long startTime = System.currentTimeMillis();
         long timeElapsed = 0;
@@ -378,5 +380,7 @@ public class SendMessagesCommon
                 fail("Timed out waiting for a stable connection after error injection");
             }
         }
+
+        System.out.println("Connection stabilized!");
     }
 }

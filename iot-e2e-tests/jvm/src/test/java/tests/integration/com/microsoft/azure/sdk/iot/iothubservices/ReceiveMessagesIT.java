@@ -59,15 +59,8 @@ public class ReceiveMessagesIT
     private static String IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME = "IOTHUB_CONNECTION_STRING";
     private static String iotHubConnectionString = "";
     private static RegistryManager registryManager;
-    private static Device deviceHttps;
-    private static Device deviceHttpsX509;
-    private static Device deviceAmqps;
-    private static Device deviceAmqpsX509;
-    private static Device deviceMqtt;
-    private static Device deviceMqttWs;
-    private static Device deviceAmqpsWs;
-    private static Device deviceAmqpsWsX509;
-    private static Device deviceMqttX509;
+    private static Device device;
+    private static Device deviceX509;
 
     private static ServiceClient serviceClient;
 
@@ -92,40 +85,17 @@ public class ReceiveMessagesIT
         x509Thumbprint = cert.getThumbPrintLeaf();
         registryManager = RegistryManager.createFromConnectionString(iotHubConnectionString);
         String uuid = UUID.randomUUID().toString();
-        String deviceIdHttps = "java-device-client-e2e-test-https".concat("-" + uuid);
-        String deviceIdAmqps = "java-device-client-e2e-test-amqps".concat("-" + uuid);
-        String deviceIdMqtt = "java-device-client-e2e-test-mqtt".concat("-" + uuid);
-        String deviceIdMqttWs = "java-device-client-e2e-test-mqttws".concat("-" + uuid);
-        String deviceIdAmqpsWS = "java-device-client-e2e-test-amqpsws".concat("-" + uuid);
-        String deviceIdMqttX509 = "java-device-client-e2e-test-mqtt-x509".concat("-" + uuid);
-        String deviceIdHttpsX509 = "java-device-client-e2e-test-https-x509".concat("-" + uuid);
-        String deviceIdAmqpsX509 = "java-device-client-e2e-test-amqps-x509".concat("-" + uuid);
-        String deviceIdAmqpsWsX509 = "java-device-client-e2e-test-amqpsws-x509".concat("-" + uuid);
 
-        deviceHttps = Device.createFromId(deviceIdHttps, null, null);
-        deviceAmqps = Device.createFromId(deviceIdAmqps, null, null);
-        deviceMqtt = Device.createFromId(deviceIdMqtt, null, null);
-        deviceMqttWs = Device.createFromId(deviceIdMqttWs, null, null);
-        deviceAmqpsWs = Device.createFromId(deviceIdAmqpsWS, null, null);
-        deviceMqttX509 = Device.createDevice(deviceIdMqttX509, AuthenticationType.SELF_SIGNED);
-        deviceHttpsX509 = Device.createDevice(deviceIdHttpsX509, AuthenticationType.SELF_SIGNED);
-        deviceAmqpsX509 = Device.createDevice(deviceIdAmqpsX509, AuthenticationType.SELF_SIGNED);
-        deviceAmqpsWsX509 = Device.createDevice(deviceIdAmqpsWsX509, AuthenticationType.SELF_SIGNED);
+        String deviceId = "java-device-client-e2e-test-receive-messages".concat("-" + uuid);
+        String x509DeviceId = "java-device-client-e2e-test-receive-messages-x509".concat("-" + uuid);
 
-        deviceMqttX509.setThumbprint(x509Thumbprint, x509Thumbprint);
-        deviceHttpsX509.setThumbprint(x509Thumbprint, x509Thumbprint);
-        deviceAmqpsX509.setThumbprint(x509Thumbprint, x509Thumbprint);
-        deviceAmqpsWsX509.setThumbprint(x509Thumbprint, x509Thumbprint);
+        device = Device.createFromId(deviceId, null, null);
+        deviceX509 = Device.createDevice(x509DeviceId, AuthenticationType.SELF_SIGNED);
 
-        registryManager.addDevice(deviceHttps);
-        registryManager.addDevice(deviceAmqps);
-        registryManager.addDevice(deviceMqtt);
-        registryManager.addDevice(deviceMqttWs);
-        registryManager.addDevice(deviceAmqpsWs);
-        registryManager.addDevice(deviceMqttX509);
-        registryManager.addDevice(deviceAmqpsWsX509);
-        registryManager.addDevice(deviceHttpsX509);
-        registryManager.addDevice(deviceAmqpsX509);
+        deviceX509.setThumbprint(x509Thumbprint, x509Thumbprint);
+
+        registryManager.addDevice(device);
+        registryManager.addDevice(deviceX509);
 
         messageProperties = new HashMap<>(3);
         messageProperties.put("name1", "value1");
@@ -139,20 +109,16 @@ public class ReceiveMessagesIT
                 new Object[][]
                         {
                                 //sas token
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceHttps), IotHubClientProtocol.HTTPS), IotHubClientProtocol.HTTPS, deviceHttps, SAS},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceMqtt), IotHubClientProtocol.MQTT), IotHubClientProtocol.MQTT, deviceMqtt, SAS},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceMqttWs), IotHubClientProtocol.MQTT_WS), IotHubClientProtocol.MQTT_WS, deviceMqttWs, SAS},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceAmqps), AMQPS), AMQPS, deviceAmqps, SAS},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceAmqpsWs), IotHubClientProtocol.AMQPS_WS), IotHubClientProtocol.AMQPS_WS, deviceAmqpsWs, SAS},
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.HTTPS), HTTPS, device, SAS},
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.MQTT), MQTT, device, SAS},
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.MQTT_WS), MQTT_WS, device, SAS},
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), AMQPS), AMQPS, device, SAS},
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, device), IotHubClientProtocol.AMQPS_WS), AMQPS_WS, device, SAS},
 
                                 //x509
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceHttpsX509), IotHubClientProtocol.HTTPS, publicKeyCert, false, privateKey, false), IotHubClientProtocol.HTTPS, deviceHttpsX509, AuthenticationType.SELF_SIGNED},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceMqttX509), IotHubClientProtocol.MQTT, publicKeyCert, false, privateKey, false), IotHubClientProtocol.MQTT, deviceMqttX509, AuthenticationType.SELF_SIGNED},
-                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceAmqpsX509), AMQPS, publicKeyCert, false, privateKey, false), AMQPS, deviceAmqpsX509, AuthenticationType.SELF_SIGNED}
-
-                                //not supported yet
-                                //{new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceAmqpsWsX509), IotHubClientProtocol.AMQPS_WS, publicKeyCert, false, privateKey, false), IotHubClientProtocol.AMQPS_WS, deviceAmqpsWsX509, AuthenticationType.SELF_SIGNED},
-                                //{new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceMqttWsX509), IotHubClientProtocol.MQTT_WS, publicKeyCert, false, privateKey, false), IotHubClientProtocol.MQTT_WS, deviceMqttWsX509, AuthenticationType.SELF_SIGNED}
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), HTTPS, publicKeyCert, false, privateKey, false), HTTPS, deviceX509, SELF_SIGNED},
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), MQTT, publicKeyCert, false, privateKey, false), MQTT, deviceX509, SELF_SIGNED},
+                                {new DeviceClient(DeviceConnectionString.get(iotHubConnectionString, deviceX509), AMQPS, publicKeyCert, false, privateKey, false), AMQPS, deviceX509, SELF_SIGNED}
                         }
         );
     }
@@ -185,15 +151,8 @@ public class ReceiveMessagesIT
         serviceClient.close();
         if (registryManager != null)
         {
-            registryManager.removeDevice(deviceHttps.getDeviceId());
-            registryManager.removeDevice(deviceAmqps.getDeviceId());
-            registryManager.removeDevice(deviceMqtt.getDeviceId());
-            registryManager.removeDevice(deviceMqttWs.getDeviceId());
-            registryManager.removeDevice(deviceAmqpsWs.getDeviceId());
-            registryManager.removeDevice(deviceMqttX509.getDeviceId());
-            registryManager.removeDevice(deviceAmqpsX509.getDeviceId());
-            registryManager.removeDevice(deviceAmqpsWsX509.getDeviceId());
-            registryManager.removeDevice(deviceHttpsX509.getDeviceId());
+            registryManager.removeDevice(device.getDeviceId());
+            registryManager.removeDevice(deviceX509.getDeviceId());
             registryManager.close();
             registryManager = null;
         }
@@ -375,7 +334,7 @@ public class ReceiveMessagesIT
             messageIdListStoredOnC2DSend.add(Integer.toString(i));
 
             // send the message. Service client uses AMQPS protocol
-            CompletableFuture<Void> future = serviceClient.sendAsync(deviceAmqps.getDeviceId(), serviceMessage);
+            CompletableFuture<Void> future = serviceClient.sendAsync(testInstance.device.getDeviceId(), serviceMessage);
             futureList.add(future);
         }
 
@@ -520,6 +479,7 @@ public class ReceiveMessagesIT
         serviceMessage.setCorrelationId(expectedCorrelationId);
         serviceMessage.setMessageId(expectedMessageId);
         serviceMessage.setProperties(messageProperties);
+        serviceClient.open();
         serviceClient.send(deviceId, serviceMessage);
     }
 
@@ -530,7 +490,7 @@ public class ReceiveMessagesIT
             long startTime = System.currentTimeMillis();
             while (!messageReceived.wasCallbackFired())
             {
-                Thread.sleep(100);
+                Thread.sleep(300);
 
                 if (System.currentTimeMillis() - startTime > receiveTimeout)
                 {
