@@ -372,10 +372,10 @@ public class ReceiveMessagesIT
 
         com.microsoft.azure.sdk.iot.device.MessageCallback callback = new MessageCallback();
 
-        if (testInstance.protocol == MQTT || testInstance.protocol == MQTT_WS)
-        {
-            callback = new MessageCallbackMqtt();
-        }
+        //if (testInstance.protocol == MQTT || testInstance.protocol == MQTT_WS)
+        //{
+        //    callback = new MessageCallbackMqtt();
+        //}
 
         Success messageReceived = new Success();
         testInstance.deviceClient.setMessageCallback(callback, messageReceived);
@@ -386,12 +386,19 @@ public class ReceiveMessagesIT
         errorInjectionMessage.setExpiryTime(200);
         testInstance.deviceClient.sendEventAsync(errorInjectionMessage, new EventCallback(null), null);
 
+        System.out.println("sent error injection message");
+
         //wait to send the message because we want to ensure that the tcp connection drop happens beforehand and we
         // want the connection to be re-established before sending anything from service client
         SendMessagesCommon.waitForStabilizedConnection(connectionStatusUpdates, ERROR_INJECTION_RECOVERY_TIMEOUT);
 
         sendMessageToDevice(testInstance.device.getDeviceId(), testInstance.protocol.toString());
+
+        System.out.println("Sent message to device, now waiting for device client to respond...");
+
         waitForMessageToBeReceived(messageReceived, testInstance.protocol.toString());
+
+        System.out.println("Device client Ack'd service message successfully!");
 
         Thread.sleep(200);
         testInstance.deviceClient.closeNow();
