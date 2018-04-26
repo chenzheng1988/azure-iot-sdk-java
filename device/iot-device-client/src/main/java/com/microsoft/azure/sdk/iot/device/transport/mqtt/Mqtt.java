@@ -354,6 +354,8 @@ abstract public class Mqtt implements MqttCallback
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage)
     {
+        System.out.println("MQTT ON MESSAGE ARRIVED: " + topic + " : " + mqttMessage);
+
         //Codes_SRS_Mqtt_25_030: [The payload of the message and the topic is added to the received messages queue .]
         this.mqttConnection.getAllReceivedMessages().add(new MutablePair<>(topic, mqttMessage.getPayload()));
 
