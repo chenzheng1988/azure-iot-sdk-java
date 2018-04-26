@@ -70,7 +70,7 @@ public class ReceiveMessagesIT
     private static String expectedCorrelationId = "1234";
     private static String expectedMessageId = "5678";
     private static final int INTERTEST_GUARDIAN_DELAY_MILLISECONDS = 2000;
-    private static final long ERROR_INJECTION_RECOVERY_TIMEOUT = 2 * 60 * 1000; // 2 minute
+    private static final long ERROR_INJECTION_RECOVERY_TIMEOUT = 1 * 60 * 1000; // 1 minute
 
     private ReceiveMessagesITRunner testInstance;
 
