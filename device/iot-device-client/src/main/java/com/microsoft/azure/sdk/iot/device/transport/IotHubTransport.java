@@ -149,6 +149,7 @@ public class IotHubTransport implements IotHubListener
     @Override
     public void onMessageReceived(IotHubTransportMessage message, Throwable e)
     {
+        System.out.println("Message received at transport layer");
         if (message != null && e != null)
         {
             //Codes_SRS_IOTHUBTRANSPORT_34_008: [If this function is called with a non-null message and a non-null
@@ -160,6 +161,8 @@ public class IotHubTransport implements IotHubListener
         }
         else if (message != null)
         {
+            System.out.println("Message received at transport layer, adding to queue");
+
             //Codes_SRS_IOTHUBTRANSPORT_34_009: [If this function is called with a non-null message and a null
             // exception, this function shall add that message to the receivedMessagesQueue.]
             logger.LogInfo("Message with hashcode %s is received from IotHub on %s, method name is %s ",
@@ -415,6 +418,7 @@ public class IotHubTransport implements IotHubListener
             IotHubTransportMessage receivedMessage = this.receivedMessagesQueue.poll();
             if (receivedMessage != null)
             {
+                System.out.println("Took message out of received messsages queue, sending ack...");
                 //Codes_SRS_IOTHUBTRANSPORT_34_048: [If this object's connection status is CONNECTED and there is a
                 // received message in the queue, this function shall acknowledge the received message
                 this.acknowledgeReceivedMessage(receivedMessage);
@@ -531,10 +535,12 @@ public class IotHubTransport implements IotHubListener
             {
                 //Codes_SRS_IOTHUBTRANSPORT_34_054: [This function shall send the message callback result along the
                 // connection as the ack to the service.]
+                System.out.println("Sending message ACK");
                 this.iotHubTransportConnection.sendMessageResult(receivedMessage, result);
             }
             catch (TransportException e)
             {
+                System.out.println("Couldn't ack message!");
                 //Codes_SRS_IOTHUBTRANSPORT_34_055: [If an exception is thrown while acknowledging the received message,
                 // this function shall add the received message back into the receivedMessagesQueue and then rethrow the exception.]
                 this.receivedMessagesQueue.add(receivedMessage);

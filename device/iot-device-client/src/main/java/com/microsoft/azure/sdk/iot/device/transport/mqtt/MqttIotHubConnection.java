@@ -456,6 +456,8 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
             this.receivedMessagesToAcknowledge.remove(message);
         }
 
+        System.out.println("ack sent status: " + ackSent);
+
         return ackSent;
     }
 
@@ -486,19 +488,24 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
             //Codes_SRS_MQTTIOTHUBCONNECTION_34_059: [If a transport message is successfully received, this function shall save it in this object's map of messages to be acknowledged along with the provided messageId.]
             this.receivedMessagesToAcknowledge.put(transportMessage, messageId);
 
+            System.out.println("determining message type of arrived message...");
+
             switch (transportMessage.getMessageType())
             {
                 case DEVICE_TWIN:
                     //Codes_SRS_MQTTIOTHUBCONNECTION_34_060: [If a transport message is successfully received, and the message has a type of DEVICE_TWIN, this function shall set the callback and callback context of this object from the saved values in config for methods.]
+                    System.out.println("TWIN MESSAGE ARRIVED");
                     transportMessage.setMessageCallback(this.config.getDeviceTwinMessageCallback());
                     transportMessage.setMessageCallbackContext(this.config.getDeviceTwinMessageContext());
                     break;
                 case DEVICE_METHODS:
                     //Codes_SRS_MQTTIOTHUBCONNECTION_34_061: [If a transport message is successfully received, and the message has a type of DEVICE_METHODS, this function shall set the callback and callback context of this object from the saved values in config for twin.]
+                    System.out.println("METHODS MESSAGE ARRIVED");
                     transportMessage.setMessageCallback(this.config.getDeviceMethodsMessageCallback());
                     transportMessage.setMessageCallbackContext(this.config.getDeviceMethodsMessageContext());
                     break;
                 case DEVICE_TELEMETRY:
+                    System.out.println("TELEMETRY MESSAGE ARRIVED");
                     //Codes_SRS_MQTTIOTHUBCONNECTION_34_062: [If a transport message is successfully received, and the message has a type of DEVICE_TELEMETRY, this function shall set the callback and callback context of this object from the saved values in config for telemetry.]
                     transportMessage.setMessageCallback(this.config.getDeviceTelemetryMessageCallback());
                     transportMessage.setMessageCallbackContext(this.config.getDeviceTelemetryMessageContext());
@@ -507,6 +514,8 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
                 case CBS_AUTHENTICATION:
                 default:
                     //do nothing
+                    System.out.println("NOT SURE WHAT MESSAgE TYPE ARRIVEDE?????");
+
             }
 
             //Codes_SRS_MQTTIOTHUBCONNECTION_34_063: [If a transport message is successfully received, this function shall notify its listener that a message was received and provide the received message.]
