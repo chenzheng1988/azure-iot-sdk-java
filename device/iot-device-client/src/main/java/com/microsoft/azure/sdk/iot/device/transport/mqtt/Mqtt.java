@@ -281,8 +281,10 @@ abstract public class Mqtt implements MqttCallback
      */
     public IotHubTransportMessage receive() throws TransportException
     {
+        System.out.println("waiting for mqtt lock to be released");
         synchronized (this.mqttLock)
         {
+            System.out.println("mqtt lock released!");
             if (this.mqttConnection == null)
             {
                 throw new TransportException(new IllegalArgumentException("Mqtt client should be initialised at least once before using it"));
