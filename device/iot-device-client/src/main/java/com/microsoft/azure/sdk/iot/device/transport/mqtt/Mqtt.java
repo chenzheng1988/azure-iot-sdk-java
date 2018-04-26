@@ -302,6 +302,7 @@ abstract public class Mqtt implements MqttCallback
                     if (data != null)
                     {
                         //remove this message from the queue as this is the correct handler
+                        System.out.println("removing message from queue");
                         allReceivedMessages.poll();
 
                         // Codes_SRS_Mqtt_34_024: [This method shall construct new Message with the bytes obtained from peekMessage and return the message.]
@@ -431,6 +432,9 @@ abstract public class Mqtt implements MqttCallback
             assignPropertiesToMessage(message, propertiesString);
         }
 
+        System.out.println("done doing stuff");
+
+
         return message;
     }
 
@@ -443,6 +447,7 @@ abstract public class Mqtt implements MqttCallback
      * */
     private void assignPropertiesToMessage(Message message, String propertiesString) throws IllegalStateException, IllegalArgumentException
     {
+        System.out.println("assugb props to message");
         //Codes_SRS_Mqtt_34_054: [A message may have 0 to many custom properties]
         //expected format is <key>=<value><MESSAGE_PROPERTY_SEPARATOR><key>=<value><MESSAGE_PROPERTY_SEPARATOR>...
         for (String propertyString : propertiesString.split(String.valueOf(MESSAGE_PROPERTY_SEPARATOR)))
@@ -495,5 +500,8 @@ abstract public class Mqtt implements MqttCallback
                 throw new IllegalArgumentException("Unexpected property string provided. Expected '=' symbol between key and value of the property in string: " + propertyString);
             }
         }
+
+        System.out.println("done assugb props to message");
+
     }
 }
