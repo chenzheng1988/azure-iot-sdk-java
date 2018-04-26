@@ -261,6 +261,7 @@ abstract public class Mqtt implements MqttCallback
                 }
 
                 //Codes_SRS_Mqtt_25_017: [The function shall subscribe to subscribeTopic specified to the IoT Hub given in the configuration.]
+                System.out.println("Subscribing to topic: " + topic);
                 IMqttToken subToken = this.mqttConnection.getMqttAsyncClient().subscribe(topic, MqttConnection.QOS);
 
                 subToken.waitForCompletion(MqttConnection.MAX_WAIT_TIME);
