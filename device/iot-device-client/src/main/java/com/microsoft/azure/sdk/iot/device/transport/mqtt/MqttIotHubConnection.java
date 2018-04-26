@@ -472,6 +472,7 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
         }
         catch (TransportException e)
         {
+            System.out.println("Couldn't receive message :( " + e);
             this.listener.onMessageReceived(null, new TransportException("Failed to receive message from service", e));
             this.logger.LogInfo("Encountered exception while receiving message from Iot Hub over MQTT");
             this.logger.LogError(e);
@@ -479,12 +480,14 @@ public class MqttIotHubConnection implements IotHubTransportConnection, MqttMess
 
         if (transportMessage == null)
         {
+            System.out.println("Null message arrived, just ignoring it");
             //Ack is not sent to service for this message because we cannot interpret the message. Service will likely re-send
             this.listener.onMessageReceived(null, new TransportException("Message sent from service could not be parsed"));
             this.logger.LogInfo("Message arrived from IoT Hub that could not be parsed. That message has been ignored.");
         }
         else
         {
+            System.out.println("so far so good!");
             //Codes_SRS_MQTTIOTHUBCONNECTION_34_059: [If a transport message is successfully received, this function shall save it in this object's map of messages to be acknowledged along with the provided messageId.]
             this.receivedMessagesToAcknowledge.put(transportMessage, messageId);
 

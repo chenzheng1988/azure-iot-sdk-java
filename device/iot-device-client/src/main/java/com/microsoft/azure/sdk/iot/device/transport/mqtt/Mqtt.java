@@ -362,7 +362,12 @@ abstract public class Mqtt implements MqttCallback
         if (this.messageListener != null)
         {
             //Codes_SRS_Mqtt_34_045: [If there is a saved listener, this function shall notify that listener that a message arrived.]
+            System.out.println("listener was notified");
             this.messageListener.onMessageArrived(mqttMessage.getId());
+        }
+        else
+        {
+            System.out.println("but no one was listening :(");
         }
     }
 
