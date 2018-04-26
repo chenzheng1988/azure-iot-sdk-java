@@ -452,6 +452,8 @@ abstract public class Mqtt implements MqttCallback
         //expected format is <key>=<value><MESSAGE_PROPERTY_SEPARATOR><key>=<value><MESSAGE_PROPERTY_SEPARATOR>...
         for (String propertyString : propertiesString.split(String.valueOf(MESSAGE_PROPERTY_SEPARATOR)))
         {
+            System.out.println("looking at prop: " + propertyString);
+
             if (propertyString.contains("="))
             {
                 //Expected format is <key>=<value> where both key and value may be encoded
@@ -496,6 +498,8 @@ abstract public class Mqtt implements MqttCallback
             }
             else
             {
+                System.out.println("rly rly bad stuff here");
+
                 //Codes_SRS_Mqtt_34_051: [If a topic string's property's key and value are not separated by the '=' symbol, an IllegalArgumentException shall be thrown]
                 throw new IllegalArgumentException("Unexpected property string provided. Expected '=' symbol between key and value of the property in string: " + propertyString);
             }
