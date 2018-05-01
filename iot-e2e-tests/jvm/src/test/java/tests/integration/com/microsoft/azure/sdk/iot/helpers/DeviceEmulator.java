@@ -5,7 +5,9 @@
 
 package tests.integration.com.microsoft.azure.sdk.iot.helpers;
 
-import com.microsoft.azure.sdk.iot.common.iothubservices.SendMessagesCommon;
+import com.microsoft.azure.sdk.iot.common.EventCallback;
+import com.microsoft.azure.sdk.iot.common.MessageAndResult;
+import com.microsoft.azure.sdk.iot.common.Success;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.DeviceTwin.Device;
 import com.microsoft.azure.sdk.iot.device.DeviceTwin.DeviceMethodCallback;
@@ -13,6 +15,7 @@ import com.microsoft.azure.sdk.iot.device.DeviceTwin.DeviceMethodData;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
 import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
+import org.junit.Assert;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -20,6 +23,9 @@ import java.net.URISyntaxException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.microsoft.azure.sdk.iot.common.iothubservices.SendMessagesCommon.openDeviceClientWithRetry;
+import static junit.framework.TestCase.fail;
 
 /**
  * Implement a fake device to the end to end test.
@@ -66,7 +72,7 @@ public class DeviceEmulator  implements Runnable
     {
         this.deviceClient = new DeviceClient(connectionString, protocol);
         clearStatistics();
-        SendMessagesCommon.openDeviceClientWithRetry(deviceClient);
+        openDeviceClientWithRetry(deviceClient);
     }
 
     /**
@@ -83,7 +89,7 @@ public class DeviceEmulator  implements Runnable
     {
         this.deviceClient = new DeviceClient(connectionString, protocol, publicKeyCert, false, privateKey, false);
         clearStatistics();
-        SendMessagesCommon.openDeviceClientWithRetry(deviceClient);
+        openDeviceClientWithRetry(deviceClient);
     }
 
     @Override
@@ -217,6 +223,35 @@ public class DeviceEmulator  implements Runnable
         }
     }
 
+    public void sendMessageAndWaitForResponse(DeviceClient client, MessageAndResult messageAndResult, int RETRY_MILLISECONDS, int SEND_TIMEOUT_MILLISECONDS, IotHubClientProtocol protocol)
+    {
+        try
+        {
+            Success messageSent = new Success();
+            EventCallback callback = new EventCallback(messageAndResult.statusCode);
+            client.sendEventAsync(messageAndResult.message, callback, messageSent);
+
+            long startTime = System.currentTimeMillis();
+            while (!messageSent.wasCallbackFired())
+            {
+                Thread.sleep(RETRY_MILLISECONDS);
+                if (System.currentTimeMillis() - startTime > SEND_TIMEOUT_MILLISECONDS)
+                {
+                    fail("Timed out waiting for a message callback");
+                    break;
+                }
+            }
+
+            if (messageAndResult.statusCode != null && messageSent.getCallbackStatusCode() != messageAndResult.statusCode)
+            {
+                Assert.fail("Sending message over " + protocol + " protocol failed: expected " + messageAndResult.statusCode + " but received " + messageSent.getCallbackStatusCode());
+            }
+        }
+        catch (Exception e)
+        {
+            Assert.fail("Sending message over " + protocol + " protocol failed: Exception encountered while sending and waiting on a message: " + e.getMessage());
+        }    }
+
     /**
      * Clean all previous state to start a new test.
      */
@@ -250,6 +285,8 @@ public class DeviceEmulator  implements Runnable
     {
         return deviceStatus.statusError;
     }
+
+    DeviceClient getDeviceClient() {return deviceClient;}
 
     private class DeviceStatus
     {
