@@ -159,6 +159,7 @@ public class IotHubTransport implements IotHubListener
             this.logger.LogError(new IllegalArgumentException("Cannot call onMessageReceived with non-null message and " +
                     "non-null throwable"));
             System.out.println("dumb call. Exception given with non-null message. Dunno what to do.........");
+            e.printStackTrace();
         }
         else if (message != null)
         {
@@ -177,7 +178,8 @@ public class IotHubTransport implements IotHubListener
             this.logger.LogError("Exception encountered while receiving messages from service, " +
                     "method name is %s", this.logger.getMethodName());
             this.logger.LogError(e);
-            System.out.println("dumb call. Exception given");
+            System.out.println("dumb call. Exception given:");
+            e.printStackTrace();
         }
     }
 
