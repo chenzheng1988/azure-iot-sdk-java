@@ -12,7 +12,6 @@ import com.microsoft.azure.sdk.iot.service.auth.AuthenticationType;
 import org.junit.Assert;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,8 +135,8 @@ public class SendMessagesCommon
     public static void sendMessagesMultiplex(DeviceClient client,
                                              IotHubClientProtocol protocol,
                                              final int NUM_MESSAGES_PER_CONNECTION,
-                                             final Integer RETRY_MILLISECONDS,
-                                             final Integer SEND_TIMEOUT_MILLISECONDS)
+                                             final long RETRY_MILLISECONDS,
+                                             final long SEND_TIMEOUT_MILLISECONDS)
     {
         String messageString = "Java client e2e test message over " + protocol + " protocol";
         Message msg = new Message(messageString);
