@@ -38,6 +38,7 @@ import static com.microsoft.azure.sdk.iot.service.auth.AuthenticationType.*;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+@Ignore
 @RunWith(Parameterized.class)
 public class ReceiveMessagesIT
 {
